@@ -45,14 +45,6 @@ class TensorflowSuite extends SharedSparkSessionSuite {
         StructField("vectorlabel", ArrayType(DoubleType, true)),
         StructField("name", StringType)))
 
-      /*val expectedSchema = StructType(
-      StructField("headers", StructType(
-        StructField("Charset", StringType, true) ::
-          StructField("Host", StringType, true) :: Nil)
-        , true) ::
-        StructField("ip", StringType, true) ::
-        StructField("nullstr", StringType, true):: Nil)*/
-
       val rdd = spark.sparkContext.parallelize(testRows)
 
       val df: DataFrame = spark.createDataFrame(rdd, schema)
@@ -69,14 +61,21 @@ class TensorflowSuite extends SharedSparkSessionSuite {
     }
 
     "Encode given Row as TensorFlow example" in {
+      val innerStructType= StructType(List(
+        StructField("movie_ratings", ArrayType(ArrayType(LongType, true), true)),
+        StructField("actors", ArrayType(ArrayType(StringType, true), true)))
+      )
+
       val schemaStructType = StructType(Array(
         StructField("IntegerTypelabel", IntegerType),
         StructField("LongTypelabel", LongType),
         StructField("FloatTypelabel", FloatType),
         StructField("DoubleTypelabel", DoubleType),
         StructField("vectorlabel", ArrayType(DoubleType, true)),
-        StructField("strlabel", StringType)
+        StructField("strlabel", StringType),
+        StructField("NestedLabel", innerStructType)
       ))
+
       val doubleArray = Array(1.1, 111.1, 11111.1)
       val expectedFloatArray = Array(1.1F, 111.1F, 11111.1F)
 
